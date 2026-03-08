@@ -17,3 +17,26 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+
+class UserProfile(BaseModel):
+
+    id: int
+    name: str
+    email: EmailStr
+    role: str
+
+    class Config:
+        orm_mode = True
+
+
+class UpdateProfile(BaseModel):
+
+    name: str
+
+
+class ChangePassword(BaseModel):
+
+    old_password: str
+    new_password: str

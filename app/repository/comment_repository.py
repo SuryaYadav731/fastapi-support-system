@@ -1,20 +1,53 @@
-from sqlalchemy.orm import Session
 from app.models.comment_model import Comment
 
 
-def add_comment(db: Session, comment_data, user_id):
+def get_comments_by_ticket(db, ticket_id):
 
-    new_comment = Comment(
-        ticket_id=comment_data.ticket_id, message=comment_data.message, user_id=user_id
+    return (
+        db.query(Comment)
+        .filter(Comment.ticket_id == ticket_id)
+        .order_by(Comment.created_at)
+        .all()
     )
 
-    db.add(new_comment)
+
+def create_comment(db, data, user_id):
+
+    comment = Comment(
+        ticket_id=data.ticket_id,
+        message=data.message,
+        user_id=user_id
+    )
+
+    db.add(comment)
     db.commit()
-    db.refresh(new_comment)
+    db.refresh(comment)
 
-    return new_comment
+    return comment
 
 
-def get_comments_by_ticket(db: Session, ticket_id: int):
+def get_comment(db, comment_id):
 
-    return db.query(Comment).filter(Comment.ticket_id == ticket_id).all()
+    return db.query(Comment).filter(Comment.id == comment_id).first()
+
+
+def update_comment(db, comment_id, data):
+
+    comment = db.query(Comment).filter(Comment.id == comment_id).first()
+
+    comment.message = data.message
+
+    db.commit()
+    db.refresh(comment)
+
+    return comment
+
+
+def delete_comment(db, comment_id):
+
+    comment = db.query(Comment).filter(Comment.id == comment_id).first()
+
+    db.delete(comment)
+    db.commit()
+
+    return {"message": "Comment deleted"}

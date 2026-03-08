@@ -16,3 +16,9 @@ class CommentResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+
+class CommentUpdate(BaseModel):
+
+    message: str

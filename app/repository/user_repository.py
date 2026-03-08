@@ -26,3 +26,32 @@ def get_user_by_email(db: Session, email: str):
 def get_user_by_id(db: Session, user_id: int):
 
     return db.query(User).filter(User.id == user_id).first()
+
+
+
+def get_user_by_id(db: Session, user_id: int):
+
+    return db.query(User).filter(User.id == user_id).first()
+
+
+def update_user_name(db: Session, user_id: int, name: str):
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    user.name = name
+
+    db.commit()
+    db.refresh(user)
+
+    return user
+
+
+def update_user_password(db: Session, user_id: int, password: str):
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    user.password = password
+
+    db.commit()
+
+    return user

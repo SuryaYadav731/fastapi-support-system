@@ -1,26 +1,69 @@
 from sqlalchemy.orm import Session
 from app.models.ticket_model import Ticket
+from sqlalchemy.orm import Session
+from app.models.ticket_model import Ticket
+from app.schemas.ticket_schema import TicketCreate
 
 
-def create_ticket(db: Session, ticket_data, user_id):
+def create_ticket(
+    db: Session,
+    title: str,
+    description: str,
+    priority: str,
+    user_id: int,
+    file_path: str | None = None
+):
 
-    new_ticket = Ticket(
-        title=ticket_data.title,
-        description=ticket_data.description,
-        priority=ticket_data.priority,
+    ticket = Ticket(
+        title=title,
+        description=description,
+        priority=priority,
         user_id=user_id,
+        attachment=file_path
     )
 
-    db.add(new_ticket)
+    db.add(ticket)
     db.commit()
-    db.refresh(new_ticket)
+    db.refresh(ticket)
 
-    return new_ticket
+    return ticket
+
+def create_ticket(
+    db: Session,
+    title: str,
+    description: str,
+    priority: str,
+    user_id: int,
+    file_path: str | None = None
+):
+
+    ticket = Ticket(
+        title=title,
+        description=description,
+        priority=priority,
+        user_id=user_id,
+        attachment=file_path
+    )
+
+    db.add(ticket)
+    db.commit()
+    db.refresh(ticket)
+
+    return ticket
 
 
-def get_all_tickets(db: Session):
+def get_all_tickets(
+    db,
+    skip: int,
+    limit: int
+):
 
-    return db.query(Ticket).all()
+    return (
+        db.query(Ticket)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
 
 
 def get_ticket_by_id(db: Session, ticket_id: int):
@@ -104,3 +147,17 @@ def add_attachment(db, ticket_id: int, file_path: str):
         db.refresh(ticket)
 
     return ticket
+def get_tickets_by_user(
+    db,
+    user_id: int,
+    skip: int,
+    limit: int
+):
+
+    return (
+        db.query(Ticket)
+        .filter(Ticket.user_id == user_id)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
