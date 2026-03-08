@@ -31,3 +31,26 @@ def login_user(db: Session, login_data: LoginRequest):
     token = create_access_token({"user_id": user.id})
 
     return {"access_token": token, "token_type": "bearer"}
+
+
+def create_admin_if_not_exists(db):
+
+    from app.models.user_model import User
+    from app.core.security import hash_password
+
+    admin = db.query(User).filter(User.role == "admin").first()
+
+    if not admin:
+
+        admin_user = User(
+            name="Admin",
+            email="suryayadav7310@gmail.com",
+            password=hash_password("Surya@123"),
+            role="admin",
+            is_active=True
+        )
+
+        db.add(admin_user)
+        db.commit()
+
+        print("Admin user created")

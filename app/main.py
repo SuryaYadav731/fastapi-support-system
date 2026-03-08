@@ -11,7 +11,8 @@ from app.routers import auth_router, ticket_router, comment_router
 from app.routers import user_router
 from app.routers import dashboard_router
 from app.routers import websocket_router
-
+from app.services.auth_service import create_admin_if_not_exists
+from app.dependencies.db_dependencies import get_db
 
 
 app = FastAPI(title="Support Ticket System", version="1.0")
@@ -52,3 +53,9 @@ async def startup():
     )
 
     FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
+@app.on_event("startup")
+def startup():
+
+    db = next(get_db())
+
+    create_admin_if_not_exists(db)
