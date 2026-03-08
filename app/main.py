@@ -17,6 +17,7 @@ from app.routers import websocket_router
 app = FastAPI(title="Support Ticket System", version="1.0")
 origins = [
     "http://localhost:3000",
+    "https://support-ticket-frontend-nine.vercel.app"
 ]
 
 app.add_middleware(
