@@ -10,7 +10,7 @@ def create_admin():
     admin = User(
         name="Surya ",
         email="suryayadav222003@gmail.com",
-        password=hash_password("Surya@123"),
+        password=hash_password(""),
         role="admin"
     )
 
