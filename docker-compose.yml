@@ -11,7 +11,7 @@ services:
       - postgres
       - redis
     environment:
-      DATABASE_URL: postgresql://postgres:Surya@7310@postgres:5433/support_ticket_db
+      DATABASE_URL: postgresql://postgres:@postgres:5433/support_ticket_db
       REDIS_URL: redis://redis:6379
 
   postgres:
@@ -19,7 +19,7 @@ services:
     container_name: postgres-db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Surya@7310
+      POSTGRES_PASSWORD:
       POSTGRES_DB: support_ticket_db
     ports:
       - "5432:5432"
