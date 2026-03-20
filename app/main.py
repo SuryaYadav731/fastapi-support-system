@@ -1,24 +1,45 @@
 from fastapi import FastAPI
-from app.database import engine
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.database import engine, Base
+
+# Import models so SQLAlchemy can register them
 from app.models import user_model, ticket_model, comment_model
-from fastapi import FastAPI
+
+# Routers
+from app.routers import (
+    auth_router,
+    ticket_router,
+    comment_router,
+    user_router,
+    analytics_router,
+    dashboard_router,
+    websocket_router
+)
+
+# Cache
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 import redis.asyncio as redis
-from app.routers import analytics_router
-from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth_router, ticket_router, comment_router
-from app.routers import user_router
-from app.routers import dashboard_router
-from app.routers import websocket_router
-from app.services.auth_service import create_admin_if_not_exists
-from app.dependencies.db_dependencies import get_db
 
 
-app = FastAPI(title="Support Ticket System", version="1.0")
+# ======================
+# FastAPI App
+# ======================
+
+app = FastAPI(
+    title="Support Ticket System",
+    version="1.0"
+)
+
+
+# ======================
+# CORS Configuration
+# ======================
+
 origins = [
     "http://localhost:3000",
-    "https://support-ticket-frontend-nine.vercel.app"
+    "http://127.0.0.1:3000",
 ]
 
 app.add_middleware(
@@ -28,7 +49,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-user_model.Base.metadata.create_all(bind=engine)
+
+
+# ======================
+# Database Tables
+# ======================
+
+Base.metadata.create_all(bind=engine)
+
+
+# ======================
+# Routers
+# ======================
 
 app.include_router(auth_router.router)
 app.include_router(ticket_router.router)
@@ -38,24 +70,38 @@ app.include_router(analytics_router.router)
 app.include_router(dashboard_router.router)
 app.include_router(websocket_router.router)
 
+
+# ======================
+# Home Route
+# ======================
+
 @app.get("/")
 def home():
     return {"message": "Support Ticket API Running"}
 
 
+# ======================
+# Redis Cache Setup
+# ======================
+
 @app.on_event("startup")
 async def startup():
 
-    redis_client = redis.from_url(
-        "redis://localhost:6379",
-        encoding="utf8",
-        decode_responses=True,
-    )
+    try:
 
-    FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
-@app.on_event("startup")
-def startup():
+        redis_client = redis.from_url(
+            "redis://localhost:6379",
+            encoding="utf8",
+            decode_responses=True,
+        )
 
-    db = next(get_db())
+        FastAPICache.init(
+            RedisBackend(redis_client),
+            prefix="fastapi-cache"
+        )
 
-    create_admin_if_not_exists(db)
+        print("Redis Cache Connected")
+
+    except Exception as e:
+
+        print("Redis connection failed:", e)

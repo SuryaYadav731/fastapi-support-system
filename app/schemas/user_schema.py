@@ -17,7 +17,7 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
-
+6
 
 
 class UserProfile(BaseModel):
